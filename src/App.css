@@ -1,38 +1,57 @@
-.App {
-  text-align: center;
+body {
+  background-color: #fffafc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.chat-section {
+  margin-top: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.chat-bubble {
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-size: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bg-pink {
+  background-color: #ffc0cb !important;
+}
+
+.text-dark {
+  color: #333 !important;
+}
+
+/* Floating heart animation */
+.floating-heart {
+  position: fixed;
+  bottom: 50px;
+  font-size: 24px;
+  animation: float 3s ease-in forwards;
+  z-index: 999;
+}
+
+@keyframes float {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-150px);
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.carousel-caption p {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 5px 10px;
+  border-radius: 8px;
+  display: inline-block;
+  color: #fff;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+footer {
+  font-size: 0.9rem;
+  padding-top: 30px;
+  color: #999;
 }
