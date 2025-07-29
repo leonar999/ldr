@@ -24,7 +24,7 @@ const POEM_LINES = [
   "My love for you will never shake,",
   "No matter what, it's you I'll take.",
   "For in this life, both tried and true,",
-  "I see forever  me and you."
+  "I see forever me and you."
 ];
 
 const LOVE_QUOTES = [
@@ -42,18 +42,6 @@ export default function RomanticLDRApp() {
   const [showConfetti, setShowConfetti] = useState(false);
   const audioRef = useRef(null);
 
-  // ── background music ──
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.volume = 0.35;
-    audio.play().catch(() => {
-      const resume = () => { audio.play(); window.removeEventListener("click", resume); };
-      window.addEventListener("click", resume, { once: true });
-    });
-    return () => { audio.pause(); audio.currentTime = 0; };
-  }, []);
-
   // ── ambient hearts every 4 s ──
   useEffect(() => {
     const id = setInterval(() => spawnHearts(5), 4000);
@@ -63,7 +51,10 @@ export default function RomanticLDRApp() {
   // ── auto‑hide surprise/confetti after 6 s ──
   useEffect(() => {
     if (showSurprise) {
-      const t = setTimeout(() => { setShowSurprise(false); setShowConfetti(false); }, 6000);
+      const t = setTimeout(() => {
+        setShowSurprise(false);
+        setShowConfetti(false);
+      }, 6000);
       return () => clearTimeout(t);
     }
   }, [showSurprise]);
@@ -75,57 +66,111 @@ export default function RomanticLDRApp() {
       left: Math.random() * 100
     }));
     setHearts((p) => [...p, ...batch]);
-    setTimeout(() => setHearts((p) => p.filter((h) => !batch.some((b) => b.id === h.id))), 4000);
+    setTimeout(
+      () =>
+        setHearts((p) =>
+          p.filter((h) => !batch.some((b) => b.id === h.id))
+        ),
+      4000
+    );
   };
 
-  // press‑me handler
+  // press‑me handler — start music here to bypass autoplay block
   const handleSurpriseClick = () => {
     spawnHearts(15);
     setShowSurprise(true);
     setShowConfetti(true);
+
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = 0.35;
+      audio.play().catch(() => {
+        console.log("Audio blocked — user interaction required");
+      });
+    }
   };
 
   // framer variants
-  const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.4 } } };
-  const lineVar   = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
+  const container = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.4 } }
+  };
+  const lineVar = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
 
   return (
-    <main className="min-vh-100 d-flex flex-column align-items-center"
-          style={{ background: "linear-gradient(135deg,#ffe5ec 0%,#ffcad4 50%,#fff3f5 100%)", overflow: "hidden" }}>
-
+    <main
+      className="min-vh-100 d-flex flex-column align-items-center"
+      style={{
+        background:
+          "linear-gradient(135deg,#ffe5ec 0%,#ffcad4 50%,#fff3f5 100%)",
+        overflow: "hidden"
+      }}
+    >
       {/* Global CSS */}
       <style>{`
-        @keyframes floatUp{0%{transform:translateY(0) scale(.8);opacity:1}
-                           100%{transform:translateY(-600px) scale(1.2);opacity:0}}
-        .floating-heart{animation:floatUp 4s ease-in-out forwards;
-                        pointer-events:none;position:absolute;bottom:0;font-size:2rem}
-        .hover-scale{transition:transform .35s,box-shadow .35s}
-        .hover-scale:hover{transform:scale(1.05);box-shadow:0 1rem 2.5rem rgba(0,0,0,.15)}
-        /* confetti */
-        @keyframes confFall{0%{transform:translateY(-10vh) rotate(0deg);opacity:1}
-                            100%{transform:translateY(110vh) rotate(360deg);opacity:0}}
-        .confetti{position:fixed;top:-5vh;font-size:1.4rem;pointer-events:none;
-                  animation:confFall 4s linear forwards;}
+        @keyframes floatUp {
+          0% {transform:translateY(0) scale(.8);opacity:1}
+          100% {transform:translateY(-600px) scale(1.2);opacity:0}
+        }
+        .floating-heart {
+          animation:floatUp 4s ease-in-out forwards;
+          pointer-events:none;
+          position:absolute;
+          bottom:0;
+          font-size:2rem;
+        }
+        .hover-scale {
+          transition:transform .35s,box-shadow .35s
+        }
+        .hover-scale:hover {
+          transform:scale(1.05);
+          box-shadow:0 1rem 2.5rem rgba(0,0,0,.15)
+        }
+        @keyframes confFall {
+          0% {transform:translateY(-10vh) rotate(0deg);opacity:1}
+          100% {transform:translateY(110vh) rotate(360deg);opacity:0}
+        }
+        .confetti {
+          position:fixed;
+          top:-5vh;
+          font-size:1.4rem;
+          pointer-events:none;
+          animation:confFall 4s linear forwards;
+        }
       `}</style>
 
       {/* hidden audio */}
-      <audio ref={audioRef} src="/assets/Daniel-Caesar-Ft-Mustafa-Toronto-2014-(TrendyBeatz.com).mp3"
-             loop preload="auto" />
+      <audio
+        ref={audioRef}
+        src="/assets/Daniel-Caesar.mp3"
+        loop
+        preload="auto"
+      />
 
       {/* ambient hearts */}
-      {hearts.map(h => (
-        <div key={h.id} className="floating-heart" style={{ left: `${h.left}%` }}>❤️</div>
+      {hearts.map((h) => (
+        <div key={h.id} className="floating-heart" style={{ left: `${h.left}%` }}>
+          ❤️
+        </div>
       ))}
 
       {/* confetti overlay */}
       {showConfetti &&
         Array.from({ length: 30 }).map((_, i) => (
-          <span key={i}
-                className="confetti"
-                style={{ left: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 2}s` }}>
+          <span
+            key={i}
+            className="confetti"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`
+            }}
+          >
             🎊
           </span>
-      ))}
+        ))}
 
       <section className="container text-center py-5">
         <h1 className="display-4 fw-bold mb-4 hover-scale">
@@ -133,38 +178,64 @@ export default function RomanticLDRApp() {
         </h1>
 
         {/* carousel */}
-        <Carousel showStatus={false} showThumbs={false} autoPlay infiniteLoop interval={3500}
-                  stopOnHover className="mb-5 rounded-4 overflow-hidden shadow hover-scale">
-          {["/assets/photo1.jpg", "/assets/photo2.jpg", "/assets/photo3.jpg"].map((src, i) => (
-            <div key={i} className="position-relative">
-              <img src={src} alt={`Slide ${i}`} className="d-block w-100"
-                   style={{ maxHeight: 480, objectFit: "cover" }} />
-              <p className="position-absolute bottom-0 start-0 end-0 text-white fw-semibold mb-3">
-                {i === 0 ? "Our first date memory ❤️"
-                         : i === 1 ? "Smiles across the miles 🥰"
-                         : "Always in my heart 💞"}
-              </p>
-            </div>
-          ))}
+        <Carousel
+          showStatus={false}
+          showThumbs={false}
+          autoPlay
+          infiniteLoop
+          interval={3500}
+          stopOnHover
+          className="mb-5 rounded-4 overflow-hidden shadow hover-scale"
+        >
+          {["/assets/photo1.jpg", "/assets/photo2.jpg", "/assets/photo3.jpg"].map(
+            (src, i) => (
+              <div key={i} className="position-relative">
+                <img
+                  src={src}
+                  alt={`Slide ${i}`}
+                  className="d-block w-100"
+                  style={{ maxHeight: 480, objectFit: "cover" }}
+                />
+                <p className="position-absolute bottom-0 start-0 end-0 text-white fw-semibold mb-3">
+                  {i === 0
+                    ? "Our first date memory ❤️"
+                    : i === 1
+                    ? "Smiles across the miles 🥰"
+                    : "Always in my heart 💞"}
+                </p>
+              </div>
+            )
+          )}
         </Carousel>
 
         {/* love note */}
-        <Card className="bg-light mb-4 shadow-sm mx-auto hover-scale" style={{ maxWidth: 640 }}>
+        <Card
+          className="bg-light mb-4 shadow-sm mx-auto hover-scale"
+          style={{ maxWidth: 640 }}
+        >
           <Card.Body className="p-4">
             <p className="fs-4 fst-italic">
-              My love, through every sunrise and across every mile, you remain my favourite place to be.
-              Thank you for making distance feel like nothing. ❤️
+              My love, through every sunrise and across every mile, you remain
+              my favourite place to be. Thank you for making distance feel like
+              nothing. ❤️
             </p>
           </Card.Body>
         </Card>
 
         {/* animated poem */}
-        <Card className="bg-warning bg-opacity-10 mb-4 mx-auto hover-scale" style={{ maxWidth: 640 }}>
+        <Card
+          className="bg-warning bg-opacity-10 mb-4 mx-auto hover-scale"
+          style={{ maxWidth: 640 }}
+        >
           <Card.Body className="p-4">
             <h3 className="mb-3">💫 A Poem for Us</h3>
             <motion.div variants={container} initial="hidden" animate="show">
               {POEM_LINES.map((line, idx) => (
-                <motion.p key={idx} variants={lineVar} className="fst-italic mb-1">
+                <motion.p
+                  key={idx}
+                  variants={lineVar}
+                  className="fst-italic mb-1"
+                >
                   {line}
                 </motion.p>
               ))}
@@ -177,10 +248,15 @@ export default function RomanticLDRApp() {
           <h2 className="h4 mb-3">💬 Our Sweet Conversations</h2>
           <div className="d-flex flex-column gap-2">
             {CHAT_LOG.map((m, i) => (
-              <div key={i}
-                   className={`rounded-3 p-2 px-3 shadow-sm hover-scale align-self-${m.sender === "Leo"
-                     ? "start bg-danger text-white" : "end bg-light"}`}
-                   style={{ maxWidth: "75%" }}>
+              <div
+                key={i}
+                className={`rounded-3 p-2 px-3 shadow-sm hover-scale align-self-${
+                  m.sender === "Leo"
+                    ? "start bg-danger text-white"
+                    : "end bg-light"
+                }`}
+                style={{ maxWidth: "75%" }}
+              >
                 <strong>{m.sender}:</strong> {m.text}
               </div>
             ))}
@@ -189,8 +265,14 @@ export default function RomanticLDRApp() {
 
         {/* buttons */}
         <div className="d-flex justify-content-center gap-4 mb-4">
-          <Button variant="outline-danger"
-                  onClick={() => setQuote(LOVE_QUOTES[Math.floor(Math.random() * LOVE_QUOTES.length)])}>
+          <Button
+            variant="outline-danger"
+            onClick={() =>
+              setQuote(
+                LOVE_QUOTES[Math.floor(Math.random() * LOVE_QUOTES.length)]
+              )
+            }
+          >
             Generate Love Quote
           </Button>
           <Button variant="danger" onClick={handleSurpriseClick}>
@@ -201,14 +283,17 @@ export default function RomanticLDRApp() {
 
         {/* surprise card */}
         {showSurprise && (
-          <motion.div className="bg-light p-4 rounded-4 shadow mx-auto"
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", stiffness: 220 }}
-                      style={{ maxWidth: 500 }}>
+          <motion.div
+            className="bg-light p-4 rounded-4 shadow mx-auto"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 220 }}
+            style={{ maxWidth: 500 }}
+          >
             <h4 className="text-danger">🎉 Surprise!</h4>
             <p className="mb-0">
-              You’re the most beautiful part of my life, Racheal. I thank God every day for you! 💖
+              You’re the most beautiful part of my life, Racheal. I thank God
+              every day for you! 💖
             </p>
           </motion.div>
         )}
