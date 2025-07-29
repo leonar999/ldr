@@ -75,7 +75,7 @@ export default function RomanticLDRApp() {
     );
   };
 
-  // press‑me handler — start music here to bypass autoplay block
+  // press‑me handler — start music here
   const handleSurpriseClick = () => {
     spawnHearts(15);
     setShowSurprise(true);
@@ -145,7 +145,7 @@ export default function RomanticLDRApp() {
       {/* hidden audio */}
       <audio
         ref={audioRef}
-        src="/assets/Daniel-Caesar.mp3"
+        src={`${process.env.PUBLIC_URL}/assets/Daniel-Caesar.mp3`}
         loop
         preload="auto"
       />
@@ -187,25 +187,23 @@ export default function RomanticLDRApp() {
           stopOnHover
           className="mb-5 rounded-4 overflow-hidden shadow hover-scale"
         >
-          {["/assets/photo1.jpg", "/assets/photo2.jpg", "/assets/photo3.jpg"].map(
-            (src, i) => (
-              <div key={i} className="position-relative">
-                <img
-                  src={src}
-                  alt={`Slide ${i}`}
-                  className="d-block w-100"
-                  style={{ maxHeight: 480, objectFit: "cover" }}
-                />
-                <p className="position-absolute bottom-0 start-0 end-0 text-white fw-semibold mb-3">
-                  {i === 0
-                    ? "Our first date memory ❤️"
-                    : i === 1
-                    ? "Smiles across the miles 🥰"
-                    : "Always in my heart 💞"}
-                </p>
-              </div>
-            )
-          )}
+          {["photo1.jpg", "photo2.jpg", "photo3.jpg"].map((name, i) => (
+            <div key={i} className="position-relative">
+              <img
+                src={`${process.env.PUBLIC_URL}/assets/${name}`}
+                alt={`Slide ${i}`}
+                className="d-block w-100"
+                style={{ maxHeight: 480, objectFit: "cover" }}
+              />
+              <p className="position-absolute bottom-0 start-0 end-0 text-white fw-semibold mb-3">
+                {i === 0
+                  ? "Our first date memory ❤️"
+                  : i === 1
+                  ? "Smiles across the miles 🥰"
+                  : "Always in my heart 💞"}
+              </p>
+            </div>
+          ))}
         </Carousel>
 
         {/* love note */}
